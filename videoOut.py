@@ -81,12 +81,12 @@ def workcard_rec(video_path, out_path):
         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 4)
         # 标注类别
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame, label, (290, 260), font, 0.6, (0, 255, 0), 1)
+        cv2.putText(frame, label, (x1, y1-10), font, 0.6, (0, 255, 0), 1)
         # 写输出流
         outVideo.write(frame)
         # 显示视频
         cv2.imshow("window", frame)
-        if cv2.waitKey(10) & 0xFF == 27:
+        if cv2.waitKey(15) & 0xFF == 27:
             break
 
     video.release()
@@ -96,9 +96,9 @@ def workcard_rec(video_path, out_path):
 
 if __name__ == '__main__':
     # 输入视频信息
-    video_path = './video/demo1.mp4'
+    video_path = './video/汤家河1.mp4'
     # 输出视频名称
-    out_path = './output/output1.mp4'
+    out_path = './output/demo1.mp4'
 
     # 载入模型和相关参数
     transform = transforms.Compose(

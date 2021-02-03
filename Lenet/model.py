@@ -11,7 +11,7 @@ class LeNet(nn.Module):
         self.pool2 = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(32*5*5, 120)
         self.fc2 = nn.Linear(120, 84)
-        self.fc3 = nn.Linear(84, 3)
+        self.fc3 = nn.Linear(84, 2)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))   # input(3, 32, 32)  output(16, 28, 28)

@@ -36,18 +36,21 @@ target_data_folder = "./frames/target"
 ​	运行train.py,设置epoch=30 lr=0.002 batch_size=36 保存模型权重
 
 ```python
-save_path = './Lenet.pth'
+save_path = Lenet1.pth
 torch.save(net.state_dict(), save_path)
 ```
 
 ##### 1.4 预测
 
-​	运行videoOut.py修改输入输出文件路径，运行即可获得输出文件
-
-    # 输入视频信息
-    video_path = './video/demo2.mp4'
-    # 输出视频名称
-    out_path = './ouput/output2.mp4'
+​	运行videoOut.py修改输入输出文件路径，运行时鼠标左键点击两下，Enter确定识别区域，
+    即可获得输出文件，中途按下ESC可停止
+    
+```python
+# 输入视频信息
+video_path = './video/demo2.mp4'
+# 输出视频名称
+out_path = './output/output2.mp4'
+```
 
 ### 2 环境
 

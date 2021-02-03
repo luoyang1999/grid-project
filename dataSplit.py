@@ -78,5 +78,5 @@ def data_set_split(src_data_folder, target_data_folder, train_scale=0.8, val_sca
 
 if __name__ == '__main__':
     src_data_folder = "./frames/images"
-    target_data_folder = "./frames/target"
+    target_data_folder = "./frames/target4"
     data_set_split(src_data_folder, target_data_folder)

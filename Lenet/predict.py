@@ -9,18 +9,16 @@ transform = transforms.Compose(
      transforms.ToTensor(),
      transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
-classes = ('front', 'others', 'reverse')
+classes = ('front','reverse')
 
 net = LeNet()
-net.load_state_dict(torch.load('Lenet.pth'))
+net.load_state_dict(torch.load('Lenet1.pth'))
 
-front_path = "../frames/target/val/front/"
-reverse_path = "../frames/target/test/reverse/"
-others_path = "../frames/target/val/others/"
+front_path = "../frames/target3/val/front/"
+reverse_path = "../frames/target3/test/reverse/"
 
 front_file = os.listdir(front_path)
 reverse_file = os.listdir(reverse_path)
-others_file = os.listdir(others_path)
 
 for file in reverse_file:
 
