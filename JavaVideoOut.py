@@ -6,29 +6,37 @@ from tqdm import trange
 import numpy as np
 from Lenet.model import LeNet
 import argparse
+import pymysql
+import shutil
 
 
 # 定义全局变量
-n = 0  # 定义鼠标按下的次数
-x1 = 0 # x,y 坐标的临时存储
+n = 0   # 定义鼠标按下的次数
+x1 = 0  # x,y 坐标的临时存储
 y1 = 0
 x2 = 0
 y2 = 0
 
-# 鼠标点击事件
-def draw_rectangle(event, x, y, flags, param):
-    global n, x1, y1, x2, y2
-    if event == cv2.EVENT_LBUTTONDOWN:
-        if n == 0:  # 首次按下保存坐标值
-            n += 1
-            x1, y1 = x, y
-            cv2.circle(param, (x1, y1), 2, (255, 255, 255), -1)  # 第一次打点
-        else:  # 第二次按下显示矩形
-            n = 0
-            x2, y2 = x, y
-            cv2.rectangle(param, (x1, y1), (x2, y2), (255, 255, 255), 3)  # 第二次画矩形
 
-            print(x1, y1, x2, y2)
+def getXY(hall_name):
+    global x1, y1, x2, y2
+    db = pymysql.connect("localhost", "root", "123456", "surveillance", charset="utf8")
+    cursor = db.cursor()
+    sql = "select * from t_anchor where hall_name=" + '"' + hall_name + '"'
+    print(sql)
+    try:
+        # 执行SQL语句
+        cursor.execute(sql)
+        # 获取所有记录列表
+        result = cursor.fetchone()
+        # 获取所有记录列表
+        x1 = result[1]
+        y1 = result[2]
+        x2 = result[3]
+        y2 = result[4]
+    except:
+        print("Error: unable to fetch data")
+    db.close()
 
 
 def workcard_rec(video_path, out_path):
@@ -45,7 +53,11 @@ def workcard_rec(video_path, out_path):
 
     # 定义视频文件输出对象
     fourcc = cv2.VideoWriter_fourcc('M', 'P', '4', '2')
-    outVideo = cv2.VideoWriter(out_path, fourcc, fps, size)  # 第一个参数是保存视频文件的绝对路径
+
+    outVideo = cv2.VideoWriter(out_path + "/wordcard.mp4", fourcc, fps, size)  # 第一个参数是保存视频文件的绝对路径
+
+    # 定义输出的记录结果
+    f = open(out_path + "/wordcard.txt", "w")
 
     # 视频窗口名称
     cv2.namedWindow('window')
@@ -56,18 +68,6 @@ def workcard_rec(video_path, out_path):
         _, frame = video.read()
         if frame is None:
             break
-        # 第一帧鼠标标定识别区域
-        if i == 0:
-            cv2.setMouseCallback('window', draw_rectangle, frame)
-            while True:
-                cv2.imshow('window', frame)
-                if cv2.waitKey(20) & 0xFF == 13:
-                    break
-        # # 默认参数
-        # x1 = 290
-        # y1 = 270
-        # x2 = 360
-        # y2 = 340
 
         # 处理输入的格式
         frame_tmp = frame[y1:y2, x1:x2]  # 统一采用这部分[270:340, 290:360]
@@ -86,13 +86,17 @@ def workcard_rec(video_path, out_path):
         # 标注类别
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, label, (x1, y1-10), font, 0.6, (0, 255, 0), 1)
+        # 写入txt文件保存
+        f.write(str(int(i/fps)) + " " + label + "\n")
         # 写输出流
         outVideo.write(frame)
         # 显示视频
         cv2.imshow("window", frame)
         if cv2.waitKey(5) & 0xFF == 27:
+            f.close()
             break
 
+    f.close()
     video.release()
     outVideo.release()
     cv2.destroyAllWindows()
@@ -100,8 +104,9 @@ def workcard_rec(video_path, out_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", default="./video/沈家屯.mp4", help="输入视频地址")
-    parser.add_argument("-o", "--output", default="./output/demo0.mp4", help="输出视频地址")
+    parser.add_argument("-i", "--input", default="./video/吕家坨.mp4", help="输入视频地址")
+    parser.add_argument("-o", "--output", default="./output/demo1.mp4", help="输出视频地址")
+    parser.add_argument("-n", "--name", default="吕家坨", help="营业厅名称")
     args = parser.parse_args()
 
     # 输入视频信息
@@ -118,5 +123,16 @@ if __name__ == '__main__':
     net = LeNet()
     net.load_state_dict(torch.load('./Lenet/Lenet.pth'))
 
+    # 获取视频建材范围
+    getXY(args.name)
+
+    # 将视频输出到无英文路径
+    tmp_path = "C:/Users/13216/IdeaProjects/ssm_springmvc/surveillance/target/classes/static/files/tmp"
+
     # 生成新的视频结果
-    workcard_rec(video_path, out_path)
+    workcard_rec(video_path, tmp_path)
+
+    # 对生成的视频进行移动
+    shutil.move(tmp_path, out_path)
+    # 对生成的txt文本进行移动
+    shutil.move()

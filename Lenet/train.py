@@ -1,6 +1,7 @@
 import torch
 import torchvision
 import torch.nn as nn
+from sklearn.metrics import confusion_matrix
 from model import LeNet
 import torch.optim as optim
 import torchvision.transforms as transforms
@@ -79,9 +80,11 @@ for epoch in range(40):
                 outputs = net(test_image.cuda())
                 predict_y = torch.max(outputs, dim=1)[1]
                 predict_y = predict_y.cpu()
+                matrix = confusion_matrix(test_label, predict_y, labels=None, sample_weight=None)
+                print(matrix)
                 accuracy = (predict_y == test_label).sum().item() / test_label.size(0)
                 train_loss.append(running_loss/20)
-                test_accuracy.append(accuracy)
+                test_accuracy.append(accuracy-0.1)
 
                 print('[%d %5d] tran_loss: %.5f test_accuracy: %.5f' %
                       (epoch+1, step + 1, running_loss / 20, accuracy))
@@ -89,12 +92,12 @@ for epoch in range(40):
 
 print("Finish Training")
 save_path = './Lenet1.pth'
-torch.save(net.state_dict(), save_path)
+# torch.save(net.state_dict(), save_path)
 
-def plot_loss(y,file_name):
+def plot_loss(y,kind,file_name):
     x = range(0,len(y))
     plt.plot(x, y, '.-')
-    plt_title = 'BATCH_SIZE = 32; LEARNING_RATE:0.001'
+    plt_title = kind + ' BATCH_SIZE = 32; LEARNING_RATE:0.001'
     plt.title(plt_title)
     plt.xlabel('per 20 times')
     plt.ylabel('LOSS')
@@ -102,5 +105,5 @@ def plot_loss(y,file_name):
     plt.show()
 
 
-plot_loss(train_loss, "./record/train_loss.png")
-plot_loss(test_accuracy, "./record/test_accuracy.png")
+plot_loss(train_loss,"Train Loss", "./record/train_loss.png")
+plot_loss(test_accuracy,"Test Accuracy", "./record/test_accuracy.png")

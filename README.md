@@ -2,14 +2,18 @@
 
 L.Y.	2021.1.28
 
+未来主要改进方面：  
+1 对于光线条件较为极端情况下的识别  
+2 对多个工牌同时进行识别
+
 ### 1 使用
 
-##### 1.1 获取固定区域画面
+##### 1.1 获取固定区域画面（新版本添加鼠标选定区域功能）
 
 ​	运行videoClip.py 抽帧区域为 [270:340, 290:360]
 
 ```python
-video_path = 'F:\冀北视频\吕家坨1'		# 修改视频文件夹
+video_path = 'F:\冀北视频\吕家坨1'	# 修改视频文件夹
 video_list = os.listdir(video_path)
 print(video_list)
 
@@ -33,7 +37,7 @@ target_data_folder = "./frames/target"
 
 ##### 1.3 训练
 
-​	运行train.py,设置epoch=30 lr=0.002 batch_size=36 保存模型权重
+​	运行train.py,设置epoch=30 lr=0.001 batch_size=36 保存模型权重
 
 ```python
 save_path = Lenet1.pth
